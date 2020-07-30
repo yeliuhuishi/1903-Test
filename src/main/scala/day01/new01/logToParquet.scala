@@ -1,38 +1,35 @@
-package com.etl
+package day01.new01
 
+import com.etl.log
 import com.util.TypeUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
-  * HDFS数据ETL处理缺省值字段，不符合要求字段
+  * @Classname Log2Parquet
+  * @Date 20/07/29 9:56
+  * @Created by YELIUHUISHI
+  * log数据转成parquet
+  *
   */
-object log2Parquet {
+object logToParquet {
   def main(args: Array[String]): Unit = {
-    // 参数判断
-    //    if(args.length !=2){
-    //      println("目录不正确，退出程序")
-    //      sys.exit()
-    //    }
-    //    val Array(inputPath, outputPath) = args
-    // 创建执行入口
     val conf = new SparkConf()
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .set("spark.driver.allowMultipleContexts", "true")
+      .set("parquet.compression", "snappy")
     val spark = SparkSession
       .builder()
-      .appName("log2Parquet")
+      .appName(this.getClass.getName)
       .master("local")
       .config(conf) // 加载配置
       .getOrCreate()
-    // 读取数据
-    //    val df = spark.read.text("data\\textLog.log")
-    //    df.show(false)
     val lines = spark.sparkContext.textFile("data\\textLog.log")
-    // 过滤数据，在切分的时候，如果有字符相连或者相连过长，程序使用split切分的时候，会默认把他当成一个字符处理
-    // 那这样导致数据不准确，同时过滤的数据太多，所以我们切分的时候，最好在split中加上总的字符串长度即可（-1）
-    val words: RDD[log] = lines
-      .filter(t => t.split(",", t.length).length >= 85)
+
+    // 读取数据
+    val rddlog: RDD[log] = lines
+      .filter(t => t.split(",", -1).length >= 85)
       .map(t => {
         val arr = t.split(",", -1)
         new log(
@@ -123,12 +120,12 @@ object log2Parquet {
           TypeUtils.str2Int(arr(84))
         )
       })
+
     import spark.implicits._
-    // 如果我们使用的是类，而不是样例类，那么此时类最多只能使用22个参数字段
-    // 那么要使用类使用超过22个字段 需要继承product特质
-    val df: DataFrame = words.toDF()
-    // 将出任后的数据存入到存储系统（本地）
-    df.write.parquet("E:\\TestLog")
-    //    df.show()
+    val df: DataFrame = rddlog.toDF()
+    df.show(1, true)
+    df.write.parquet("E:\\TestLog1")
+    // 使用parquet格式+snappy压缩格式实现文件的压缩，减少数据的大小，增加数据的加载速度
+    spark.stop()
   }
 }

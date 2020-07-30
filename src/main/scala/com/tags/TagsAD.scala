@@ -25,6 +25,15 @@ object TagsAD extends Tags {
     if (StringUtils.isNotBlank(adName)) {
       list :+= ("LN" + adName, 1)
     }
+    // 渠道
+    val china = row.getAs[Int]("adplatformproviderid")
+    // 地域标签
+    val provincename = row.getAs[String]("provincename")
+    val cityname = provincename, row.getAs[String]("cityname")
+    if(StringUtils.isNoneBlank(provincename)){
+      list:+=("ZP"+provincename,1)
+      list:+=("ZC"+cityname,1)
+    }
     list
   }
 }

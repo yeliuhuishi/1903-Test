@@ -1,4 +1,4 @@
-package com.tags
+package com.util
 
 import org.apache.spark.sql.Row
 import org.spark_project.jetty.util.StringUtil
