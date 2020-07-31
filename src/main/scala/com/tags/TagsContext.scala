@@ -1,6 +1,6 @@
 package com.tags
 
-import com.util.TagUtils
+import com.util.{JedisConnectionPool, TagUtils}
 import org.apache.spark.SparkConf
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.SparkSession
@@ -44,23 +44,29 @@ object TagsContext {
     df.filter(TagUtils.OneUserId)
       //进行打标签处理
       .rdd
-      .map(row => {
-        // 获取不为空的唯一UserId
-        val userId = TagUtils.getAnyOneUserId(row)
-        //  广告位类型（标签格式：LC0x -> 1 或者 LCxx -> 1 ）xx 为数字
-        // 小于 10 补 0,，把广告位类型名称，LN 插屏 -> 1
-        row.getAs[Int]("adspacetype")
-        row.getAs[Int]("adspacetypename")
-        // 广告类型标签
-        val adList: List[(String, Int)] = TagsAD.makeTags(row)
-        // APP标签
-        val appList = TagApp.makeTags(row, mapBroad)
-        // 设备标签
-        val devList = TagsDev.makeTags(row)
-        // 关键字标签
-        val kwList = TagsKeyWork.makeTags(row, stopBroad)
-
-        devList
+      .mapPartitions(rdd => {
+        val jedis = JedisConnectionPool.getConnection
+        val ite = rdd.map(row => {
+          // 获取不为空的唯一UserId
+          val userId = TagUtils.getAnyOneUserId(row)
+          //  广告位类型（标签格式：LC0x -> 1 或者 LCxx -> 1 ）xx 为数字
+          // 小于 10 补 0,，把广告位类型名称，LN 插屏 -> 1
+          row.getAs[Int]("adspacetype")
+          row.getAs[Int]("adspacetypename")
+          // 广告类型标签
+          val adList: List[(String, Int)] = TagsAD.makeTags(row)
+          // APP标签
+          val appList = TagApp.makeTags(row, mapBroad)
+          // 设备标签
+          val devList = TagsDev.makeTags(row)
+          // 关键字标签
+          val kwList = TagsKeyWork.makeTags(row, stopBroad)
+          // 商圈标签
+          val busList: List[(String, Int)] = TagBusiness.makeTags(row, jedis)
+          (userId, adList ++ appList ++ devList ++ kwList ++ busList)
+        })
+        jedis.close()
+        ite
       })
 
   }

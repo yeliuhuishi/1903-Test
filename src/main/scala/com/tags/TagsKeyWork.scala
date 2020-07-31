@@ -25,5 +25,6 @@ object TagsKeyWork extends Tags {
       .foreach(word => {
         list :+= ("k" + word, 1)
       })
+    list
   }
 }

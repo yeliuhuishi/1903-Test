@@ -31,8 +31,6 @@ A
 data/app_dict.txt,1\5\159a4c9d38a4e889a54b74d329f5af6e97530b4e
 T
 $src/main/scala/com/test/AppRpt.scala,d\a\da8bdfc21c36608e25c1668547e738104770fd52
-V
-&src/main/scala/com/tags/TagUtils.scala,3\9\3985c39072dec151392fec8f9b5c92f1531d025d
 R
 "src/main/scala/com/util/Tags.scala,6\4\640b51375ceb5219ef9fff60011f60e27a5df2f4
 T
@@ -43,3 +41,15 @@ Y
 -src/main/scala/day01/new01/logToParquet.scala,7\e\7e0c87a18da56c94e48255d94037240fc8cd4acf
 ^
 .src/main/scala/day01/new01/parquetToJson.scala,4\6\46086bc84f59ec3352baf80eff18f63b90567ea9
+S
+#src/main/resources/application.conf,3\5\3583a03abc61f9a983b67fd3810cb1f4192490b6
+B
+data/stopwords.txt,f\0\f0ab09c923d3f2621dd2d14864dbadbe0faf1c49
+T
+$src/main/scala/com/tags/TagApp.scala,4\0\40e549b416c21724d700ec9225c47500a44de5bd
+U
+%src/main/scala/com/tags/TagsDev.scala,1\b\1b20584cc7c41b5109316b7ef1cb2ed4ce5ba927
+Y
+)src/main/scala/com/tags/TagsKeyWork.scala,4\6\46c68fb2a330d44215de5b5175475b3e48810100
+V
+&src/main/scala/com/util/TagUtils.scala,1\5\1581c09d1e12e8f26896fb04dbaa200cf4b848a0

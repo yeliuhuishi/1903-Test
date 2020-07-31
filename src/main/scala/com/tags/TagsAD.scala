@@ -29,10 +29,10 @@ object TagsAD extends Tags {
     val china = row.getAs[Int]("adplatformproviderid")
     // 地域标签
     val provincename = row.getAs[String]("provincename")
-    val cityname = provincename, row.getAs[String]("cityname")
-    if(StringUtils.isNoneBlank(provincename)){
-      list:+=("ZP"+provincename,1)
-      list:+=("ZC"+cityname,1)
+    val cityname = row.getAs[String]("cityname")
+    if (StringUtils.isNoneBlank(provincename)) {
+      list :+= ("ZP" + provincename, 1)
+      list :+= ("ZC" + cityname, 1)
     }
     list
   }
