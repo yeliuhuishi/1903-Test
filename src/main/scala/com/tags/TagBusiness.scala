@@ -1,7 +1,7 @@
 package com.tags
 
 import ch.hsr.geohash.GeoHash
-import com.util.{AmapUtil, Tags}
+import com.util.{AmapUtil, Tags, TypeUtils}
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.Row
 import redis.clients.jedis.Jedis
@@ -22,8 +22,20 @@ object TagBusiness extends Tags {
     val row = args(0).asInstanceOf[Row]
     val jedis = args(1).asInstanceOf[Jedis]
     // 获取经纬度
-    val long = row.getAs[Double]("longs")
-    val lat = row.getAs[Double]("lat")
+    if (TypeUtils.str2Double(row.getAs[String]("longs")) >= 73
+        && TypeUtils.str2Double(row.getAs[String]("longs")) <= 135
+        && TypeUtils.str2Double(row.getAs[String]("lat")) >= 3
+        && TypeUtils.str2Double(row.getAs[String]("lat")) <= 53) {
+      val long = TypeUtils.str2Double(row.getAs[String]("longs"))
+      val lat = TypeUtils.str2Double(row.getAs[String]("lat"))
+      val business = getBusiness(long, lat, jedis)
+      if (StringUtils.isNotBlank(business)) {
+        val arr = business.split(",")
+        arr.foreach(str => {
+          list :+= (str, 1)
+        })
+      }
+    }
     // 通过经纬度获取商圈
     // 如果直接访问高德第三方插件，是收费的，所以不能直接这么做，太烧钱了
     // 先去缓存访问一次，没有的话，再去高德获取，如果直接拿去，不用访问高德
@@ -35,13 +47,7 @@ object TagBusiness extends Tags {
     //    arr.foreach(t => {
     //      list :+= (t, 1)
     //    })
-    val business = getBusiness(long, lat, jedis)
-    if (StringUtils.isNotBlank(business)) {
-      val arr = business.split(",")
-      arr.foreach(str => {
-        list :+= (str, 1)
-      })
-    }
+
     list
   }
 

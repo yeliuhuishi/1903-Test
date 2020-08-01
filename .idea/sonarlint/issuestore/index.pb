@@ -53,3 +53,13 @@ Y
 )src/main/scala/com/tags/TagsKeyWork.scala,4\6\46c68fb2a330d44215de5b5175475b3e48810100
 V
 &src/main/scala/com/util/TagUtils.scala,1\5\1581c09d1e12e8f26896fb04dbaa200cf4b848a0
+Z
+*src/main/scala/com/util/HttpUtilTest.scala,6\6\66be73b3cdc1c6f37316c36bbe80e7e876d654d9
+R
+"src/main/scala/com/util/test.scala,4\7\47469ed4b3a6ee8caf8cc726a45da6f6d73a2e05
+V
+&src/main/scala/com/util/AmapUtil.scala,e\e\eea86cc91f53e11840ccc3e299f5cfbe018ff00b
+Y
+)src/main/scala/com/tags/TagBusiness.scala,0\3\033ec6991a592dda18ea9016e078ba29d4e21127
+a
+1src/main/scala/com/util/JedisConnectionPool.scala,d\8\d8ae578b051d614f0e9189ff9555386239c9e47f
