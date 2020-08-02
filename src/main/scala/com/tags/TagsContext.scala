@@ -1,7 +1,7 @@
 package com.tags
 
 import com.typesafe.config.ConfigFactory
-import com.util.{TagUtils}
+import com.util.{JedisConnectionPool, TagUtils}
 import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.hbase.client.{ConnectionFactory, Put}
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
@@ -34,7 +34,7 @@ object TagsContext {
     val hbaseTableName = load.getString("hbase.TabName")
     // 加载Hbase配置
     val configuration = spark.sparkContext.hadoopConfiguration
-    configuration.set("hbase.zookeeper.quorum", load.getString("hbase.zk"))
+    configuration.set("hbase.zookeeper.quorum", load.getString("Centos7"))
     // 如果配置文件内的zk是分开写的，就是端口和host分开，那么要使用下面这样的连接方式
     //    configuration.set("hbase.zookeeper.quorum",load.getString("hbase.host"))
     //    configuration.set("hbase.zookeeper.property.clientPort",load.getString("hbase.port"))
@@ -74,7 +74,7 @@ object TagsContext {
       })
       .collectAsMap()
     // 广播字典
-    val mapBroad = spark.sparkContext.broadcast(dicMap)
+    val mapBroad = spark.sparkContext.broadcast()
     // 读取停用词库
     val arr = spark.sparkContext.textFile(stopWords).collect()
     val stopBroad: Broadcast[Array[String]] = spark.sparkContext.broadcast(arr)
@@ -85,7 +85,7 @@ object TagsContext {
       // 进行打标签处理
       .rdd
       .mapPartitions(rdd => {
-        //      val jedis = JedisConnectionPool.getConnection()
+        val jedis = JedisConnectionPool.getConnection()
         val ite = rdd.map(row => {
           // 获取不为空的唯一UserId
           val userId = TagUtils.getAnyOneUserId(row)
@@ -100,14 +100,14 @@ object TagsContext {
           // 关键字标签
           val kwList = TagsKeyWork.makeTags(row, stopBroad)
           // 商圈标签
-          //         val busList = TagsBusiness.makeTags(row, jedis)
-          (userId, adList ++ appList ++ devList ++ kwList)
+          val busList = TagBusiness.makeTags(row, jedis)
+          (userId, adList ++ appList ++ devList ++ kwList ++ busList)
         })
-        //      jedis.close()
+        jedis.close()
         ite
       })
       .reduceByKey((list1, list2) => {
-        val list: List[((String, Int), (String, Int))] = list1.zip(list2)
+        val list = list1.zip(list2)
         list.map(t => (t._1._1, t._2._2 + t._1._2))
       })
       .map {
@@ -119,6 +119,7 @@ object TagsContext {
             Bytes.toBytes(userTags.mkString(","))
           )
           (new ImmutableBytesWritable(), put)
+
         }
         // 存入HBASE
       }

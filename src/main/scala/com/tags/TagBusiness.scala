@@ -66,7 +66,7 @@ object TagBusiness extends Tags {
     if (business == null || business.length == 0) {
       business = AmapUtil.getBusinessFromAmap(long, lat)
       // 请求完成后，在将此商圈存入数据库一份，为了下次使用
-      if (business == null) {
+      if (business != null || business.length > 0) {
         redis_insertBusiness(geoHash, business, jedis)
       }
     }

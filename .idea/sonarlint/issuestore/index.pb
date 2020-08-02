@@ -41,8 +41,6 @@ Y
 -src/main/scala/day01/new01/logToParquet.scala,7\e\7e0c87a18da56c94e48255d94037240fc8cd4acf
 ^
 .src/main/scala/day01/new01/parquetToJson.scala,4\6\46086bc84f59ec3352baf80eff18f63b90567ea9
-S
-#src/main/resources/application.conf,3\5\3583a03abc61f9a983b67fd3810cb1f4192490b6
 B
 data/stopwords.txt,f\0\f0ab09c923d3f2621dd2d14864dbadbe0faf1c49
 T
