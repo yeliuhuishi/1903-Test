@@ -2,10 +2,8 @@ package com.tags
 
 import com.typesafe.config.ConfigFactory
 import com.util.TagUtils
-import org.apache.hadoop.hbase.client.{ConnectionFactory, Put}
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable
+import org.apache.hadoop.hbase.client.ConnectionFactory
 import org.apache.hadoop.hbase.mapred.TableOutputFormat
-import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.SparkConf
@@ -15,7 +13,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 /**
   * 上下文标签-> 用于合并总标签
   */
-object TagsContext {
+object TagsContextV2 {
   def main(args: Array[String]): Unit = {
 
     val Array(inputPath, app_dic, stopWords, day) = args
@@ -86,12 +84,12 @@ object TagsContext {
       .rdd
       .mapPartitions(rdd => {
         //      val jedis = JedisConnectionPool.getConnection()
-        val ite: Iterator[(String, List[(String, Int)])] =
+        val ite =
           rdd.map(row => {
             // 获取不为空的唯一UserId
-            val userId = TagUtils.getAnyOneUserId(row)
+//            val userId = TagUtils.getAnyOneUserId(row)
             // 获取所有不为空的唯一UserId
-//            val userId = TagUtils.getAllUserId(row)
+            val userId = TagUtils.getAllUserId(row)
             // 广告类型标签
             val adList: List[(String, Int)] = TagsAD.makeTags(row)
             // APP标签
@@ -111,18 +109,18 @@ object TagsContext {
         val list: List[((String, Int), (String, Int))] = list1.zip(list2)
         list.map(t => (t._1._1, t._2._2 + t._1._2))
       })
-      .map {
-        case (userId, userTags) => {
-          val put = new Put(Bytes.toBytes(userId))
-          put.addImmutable(
-            Bytes.toBytes("tags"),
-            Bytes.toBytes(day),
-            Bytes.toBytes(userTags.mkString(","))
-          )
-          (new ImmutableBytesWritable(), put)
-        }
-        // 存入HBASE
-      }
-      .saveAsHadoopDataset(jobConf)
+//      .map {
+//        case (userId, userTags) => {
+//          val put = new Put(Bytes.toBytes(userId))
+//          put.addImmutable(
+//            Bytes.toBytes("tags"),
+//            Bytes.toBytes(day),
+//            Bytes.toBytes(userTags.mkString(","))
+//          )
+//          (new ImmutableBytesWritable(), put)
+//        }
+//        // 存入HBASE
+//      }
+//      .saveAsHadoopDataset(jobConf)
   }
 }

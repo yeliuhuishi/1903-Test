@@ -61,3 +61,5 @@ Y
 )src/main/scala/com/tags/TagBusiness.scala,0\3\033ec6991a592dda18ea9016e078ba29d4e21127
 a
 1src/main/scala/com/util/JedisConnectionPool.scala,d\8\d8ae578b051d614f0e9189ff9555386239c9e47f
+O
+target/classes/application.conf,7\e\7e0f25df2d7b05ad5bb90d12521fbc046542bc6f

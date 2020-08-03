@@ -18,7 +18,7 @@ object JedisConnectionPool {
   // 链接最大等待时间
   config.setMaxWaitMillis(40000)
   private val pool =
-    new JedisPool(config, "192.168.203.7", 6379, 10000)
+    new JedisPool(config, "192.168.203.7", 6379, 10000, "123")
   def getConnection() = {
     pool.getResource
   }
